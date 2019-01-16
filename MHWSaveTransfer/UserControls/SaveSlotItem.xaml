@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="MHWSaveTransfer.UserControls.SaveSlotItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:root="clr-namespace:MHWSaveTransfer"
+             xmlns:uc="clr-namespace:MHWSaveTransfer.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="80" d:DesignWidth="300"
+             x:Name="SaveSlotItemElement">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Text="{Binding SaveSlot.HunterName, ElementName=SaveSlotItemElement}" Grid.ColumnSpan="3"
+                   Grid.Row="0" Grid.Column="0"
+                   TextAlignment="Center" FontWeight="Bold"
+                   VerticalAlignment="Center"/>
+
+        <Separator Grid.Row="1" Grid.ColumnSpan="3" Margin="0,0,0,5"/>
+
+        <uc:KeyValueDisplayThing Key="Gender" Value="{Binding SaveSlot.Gender, ElementName=SaveSlotItemElement}"
+                                 Grid.Row="2" Grid.Column="0"/>
+        <uc:KeyValueDisplayThing Key="PlayTime" Value="{Binding SaveSlot.PlayTime, ElementName=SaveSlotItemElement}"
+                                 Grid.Row="2" Grid.Column="2"/>
+
+        <uc:KeyValueDisplayThing Key="Funds" Value="{Binding SaveSlot.Zenny, ElementName=SaveSlotItemElement}"
+                                 Grid.Row="3" Grid.Column="0"/>
+        <uc:KeyValueDisplayThing Key="HR" Value="{Binding SaveSlot.HunterRank, ElementName=SaveSlotItemElement}"
+                                 Grid.Row="3" Grid.Column="2"/>
+    </Grid>
+</UserControl>

@@ -3,10 +3,94 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:MHWSaveTransfer"
+        xmlns:root="clr-namespace:MHWSaveTransfer"
+        xmlns:vm="clr-namespace:MHWSaveTransfer.ViewModels"
+        xmlns:uc="clr-namespace:MHWSaveTransfer.UserControls"
+        xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="MHWSaveTransfer" Height="450" Width="800"
+        x:Name="MainWindowElement" ResizeMode="CanResizeWithGrip">
+    <Window.DataContext>
+        <vm:MainWindowViewModel x:Name="vm"/>
+    </Window.DataContext>
+
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" Background="White">
+            <MenuItem Header="File">
+                <MenuItem Header="Open SaveData" Command="{Binding OpenSaveDataCommand}"/>
+                <MenuItem Header="Save SaveData" Command="{Binding SaveSaveDataCommand}"/>
+                <Separator/>
+                <MenuItem Header="Import SaveData / SaveSlots" Command="{Binding ImportSaveDataCommand}"/>
+                <Separator/>
+                <MenuItem Header="Clear workspace" Command="{Binding ClearWorkspaceCommand}"/>
+            </MenuItem>
+        </Menu>
+
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem Content="Version: 1.0.0 (f5510)"/>
+            <StatusBarItem Content="Use MHWAppearanceEditor for more advanced appearance editing"
+                           Foreground="Gray" ToolTip="Click to open Nexus page"/>
+        </StatusBar>
+
+        <Grid Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Grid.Row="0">
+                <Run Text="SteamID:"/>
+                <Run Text="{Binding SteamId, Mode=OneWay}"/>
+                <Run Text="(click to change)" Foreground="Gray"/>
+            </TextBlock>
+
+            <ListView Grid.Column="0" Grid.Row="1" ItemsSource="{Binding MySaveSlots}" SelectionMode="Single"
+                      dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True"
+                      dd:DragDrop.DropHandler="{Binding}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <!-- Transparent background is there to make the whole control right-clickable for the context menu -->
+                        <uc:SaveSlotItem SaveSlot="{Binding}" Background="Transparent">
+                            <uc:SaveSlotItem.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Change hunter name" Command="{Binding ChangeHunterNameCommand}"/>
+                                    <MenuItem Header="Change palico name" Command="{Binding ChangePalicoNameCommand}"/>
+                                    <MenuItem Header="Toggle gender" Command="{Binding ToggleGenderCommand}"/>
+                                    <!--<Separator/>
+                                    <MenuItem Header="Export as .mhwslot"/>-->
+                                </ContextMenu>
+                            </uc:SaveSlotItem.ContextMenu>
+                        </uc:SaveSlotItem>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+
+            <TextBlock Grid.Column="2" Grid.Row="0" Text="Other save slots"/>
+            <ListView Grid.Column="2" Grid.Row="1" ItemsSource="{Binding OtherSaveSlots}" SelectionMode="Single"
+                      dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True"
+                      dd:DragDrop.DropHandler="{Binding}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <uc:SaveSlotItem SaveSlot="{Binding}"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+        </Grid>
+    </DockPanel>
 </Window>
