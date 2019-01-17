@@ -46,6 +46,17 @@ namespace MHWSaveTransfer.ViewModels
             return new SaveSlotViewModel((SaveSlot)SaveSlot.Clone());
         }
 
+        /// <summary>
+        /// Compare based on only HunterName + PalicoName + PlayTime
+        /// </summary>
+        /// <returns>True when same</returns>
+        public bool SoftCompare(SaveSlotViewModel other)
+        {
+            string str1 = SaveSlot.HunterName + SaveSlot.PalicoName + SaveSlot.PlayTime;
+            string str2 = other.SaveSlot.HunterName + other.SaveSlot.PalicoName + other.SaveSlot.PlayTime;
+            return str1 == str2;
+        }
+
         public string HunterName { get => SaveSlot.HunterName; set => SaveSlot.HunterName = value; }
         public int HunterRank { get => SaveSlot.HunterRank; set => SaveSlot.HunterRank = value; }
         public int Zenny { get => SaveSlot.Zenny; set => SaveSlot.Zenny = value; }

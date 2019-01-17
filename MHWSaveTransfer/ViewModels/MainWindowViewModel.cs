@@ -5,6 +5,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
 
 namespace MHWSaveTransfer.ViewModels
@@ -80,11 +81,11 @@ namespace MHWSaveTransfer.ViewModels
                     try
                     {
                         SaveData saveData = new SaveData(fileName);
-                        saveData.SaveSlots.ForEach(x =>
+                        saveData.SaveSlots.ForEach(saveSlot =>
                         {
-                            // Only add if not already added, based on SaveSlotViewModel.Equals()
-                            SaveSlotViewModel newVm = new SaveSlotViewModel(x);
-                            if (OtherSaveSlots.Contains(newVm) == false)
+                            // Only add if not already added
+                            SaveSlotViewModel newVm = new SaveSlotViewModel(saveSlot);
+                            if (OtherSaveSlots.FirstOrDefault(x => x.SoftCompare(newVm)) == null)
                                 OtherSaveSlots.Add(newVm);
                         });
                     }
@@ -144,12 +145,19 @@ namespace MHWSaveTransfer.ViewModels
             {
                 if (e.TargetCollection == MySaveSlots)
                 {
-                    // Change order
+                    // When you move an item after the last item UnfilteredInsertIndex == MySaveSlots.Count
+                    // which would throw and OutOfRange exception so in those cases we simply
+                    // set insertIndex -= 1 which gives the same desired result (move item after)
+                    int insertIndex = e.UnfilteredInsertIndex;
+                    if (insertIndex > MySaveSlots.Count - 1)
+                        insertIndex = MySaveSlots.Count - 1;
+
+                    MySaveSlots.Move(e.DragInfo.SourceIndex, insertIndex);
                 }
                 else if (e.TargetCollection == OtherSaveSlots)
                 {
                     // Add (a copy) if not exists
-                    if (OtherSaveSlots.Contains(sourceItem) == false)
+                    if (OtherSaveSlots.FirstOrDefault(x => x.SoftCompare(sourceItem)) == null)
                         OtherSaveSlots.Add((SaveSlotViewModel)sourceItem.Clone());
                 }
             }
