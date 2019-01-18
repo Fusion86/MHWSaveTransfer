@@ -27,9 +27,9 @@
         </Menu>
 
         <StatusBar DockPanel.Dock="Bottom">
-            <StatusBarItem Content="Version: 1.0.0 (f5510)"/>
+            <StatusBarItem Content="{Binding VersionString}"/>
             <StatusBarItem Content="Use MHWAppearanceEditor for more advanced appearance editing"
-                           Foreground="Gray" ToolTip="Click to open Nexus page"/>
+                           Foreground="Gray" ToolTip="Right-click to open Nexus page" Cursor="Hand" MouseDown="StatusBarItem_MouseDown"/>
         </StatusBar>
 
         <Grid Margin="5">
@@ -44,7 +44,11 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Column="0" Grid.Row="0">
+            <TextBlock Grid.Column="0" Grid.Row="0" Cursor="Hand">
+                <TextBlock.InputBindings>
+                    <MouseBinding Command="{Binding ChangeSteamIdCommand}" MouseAction="LeftClick" />
+                </TextBlock.InputBindings>
+                
                 <Run Text="SteamID:"/>
                 <Run Text="{Binding SteamId, Mode=OneWay}"/>
                 <Run Text="(click to change)" Foreground="Gray"/>

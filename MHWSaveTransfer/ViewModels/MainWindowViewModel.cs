@@ -1,11 +1,14 @@
 ﻿using Cirilla.Core.Models;
 using GongSolutions.Wpf.DragDrop;
+using MHWSaveTransfer.Dialogs;
+using MHWSaveTransfer.Helpers;
 using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 
 namespace MHWSaveTransfer.ViewModels
@@ -17,12 +20,14 @@ namespace MHWSaveTransfer.ViewModels
         public ObservableCollection<SaveSlotViewModel> MySaveSlots { get; } = new ObservableCollection<SaveSlotViewModel>();
         public ObservableCollection<SaveSlotViewModel> OtherSaveSlots { get; } = new ObservableCollection<SaveSlotViewModel>();
 
-        public string SteamId => _saveData?.Header.SteamId.ToString() ?? "(none)";
+        public string SteamId => _saveData?.SteamId.ToString() ?? "(none)";
+        public string VersionString => "Version: " + Assembly.GetExecutingAssembly().GetName().Version;
 
         public RelayCommand OpenSaveDataCommand { get; }
         public RelayCommand SaveSaveDataCommand { get; }
         public RelayCommand ImportSaveDataCommand { get; }
         public RelayCommand ClearWorkspaceCommand { get; }
+        public RelayCommand ChangeSteamIdCommand { get; }
 
         private SaveData _saveData { get; set; }
 
@@ -32,6 +37,7 @@ namespace MHWSaveTransfer.ViewModels
             SaveSaveDataCommand = new RelayCommand(SaveSaveData, CanSaveSaveData);
             ImportSaveDataCommand = new RelayCommand(ImportSaveData, CanImportSaveData);
             ClearWorkspaceCommand = new RelayCommand(ClearWorkspace);
+            ChangeSteamIdCommand = new RelayCommand(ChangeSteamId, CanChangeSteamId);
         }
 
         #region Commands
@@ -42,6 +48,11 @@ namespace MHWSaveTransfer.ViewModels
             _saveData = null;
 
             OpenFileDialog ofd = new OpenFileDialog();
+
+            string savePath = Utility.GetMhwSaveDir();
+            if (savePath != null)
+                ofd.InitialDirectory = savePath;
+
             if (ofd.ShowDialog() == true)
             {
                 try
@@ -102,6 +113,28 @@ namespace MHWSaveTransfer.ViewModels
             MySaveSlots.Clear();
             OtherSaveSlots.Clear();
             _saveData = null;
+        }
+
+        private bool CanChangeSteamId() => _saveData != null;
+        private void ChangeSteamId()
+        {
+            EnterTextDialog dialog = new EnterTextDialog("Enter SteamID", SteamId);
+            dialog.Owner = Application.Current.MainWindow;
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    // Try to set SteamId in savedata
+                    _saveData.SteamId = long.Parse(dialog.Text);
+
+                    // Update UI
+                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(SteamId)));
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Couldn't change SteamID", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
 
         #endregion

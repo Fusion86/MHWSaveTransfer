@@ -1,7 +1,9 @@
 ﻿using Cirilla.Core.Enums;
 using Cirilla.Core.Models;
+using MHWSaveTransfer.Dialogs;
 using System;
 using System.ComponentModel;
+using System.Windows;
 
 namespace MHWSaveTransfer.ViewModels
 {
@@ -63,6 +65,7 @@ namespace MHWSaveTransfer.ViewModels
         public int ResearchPoints { get => SaveSlot.ResearchPoints; set => SaveSlot.ResearchPoints = value; }
         public int HunterXp { get => SaveSlot.HunterXp; set => SaveSlot.HunterXp = value; }
         public string Gender => Enum.GetName(typeof(Gender), SaveSlot.CharacterAppearance.Gender);
+        public string PalicoName { get => SaveSlot.PalicoName; set => SaveSlot.PalicoName = value; }
 
         public string PlayTime
         {
@@ -77,12 +80,36 @@ namespace MHWSaveTransfer.ViewModels
 
         private void ChangeHunterName()
         {
-
+            EnterTextDialog dialog = new EnterTextDialog("Enter hunter name", HunterName);
+            dialog.Owner = Application.Current.MainWindow;
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    HunterName = dialog.Text;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Couldn't change hunter name", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
 
         private void ChangePalicoName()
         {
-
+            EnterTextDialog dialog = new EnterTextDialog("Enter palico name", PalicoName);
+            dialog.Owner = Application.Current.MainWindow;
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    PalicoName = dialog.Text;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Couldn't change palico name", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
 
         private void ToggleGender()
