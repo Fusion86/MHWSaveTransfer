@@ -73,6 +73,7 @@ namespace MHWSaveTransfer.ViewModels
         private void SaveSaveData()
         {
             SaveFileDialog sfd = new SaveFileDialog();
+            sfd.FileName = "SAVEDATA1000";
             if (sfd.ShowDialog() == true)
             {
                 for (int i = 0; i < 3; i++)

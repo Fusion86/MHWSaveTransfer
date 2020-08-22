@@ -19,5 +19,10 @@ namespace MHWSaveTransfer
             if (e.RightButton == MouseButtonState.Pressed)
                 Process.Start(@"https://www.nexusmods.com/monsterhunterworld/mods/486");
         }
+
+        private void ExitMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
     }
 }

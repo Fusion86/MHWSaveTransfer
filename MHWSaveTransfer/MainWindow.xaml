@@ -20,9 +20,11 @@
                 <MenuItem Header="Open SaveData" Command="{Binding OpenSaveDataCommand}"/>
                 <MenuItem Header="Save SaveData" Command="{Binding SaveSaveDataCommand}"/>
                 <Separator/>
-                <MenuItem Header="Import SaveData / SaveSlots" Command="{Binding ImportSaveDataCommand}"/>
+                <MenuItem Header="Import SaveData/SaveSlots" Command="{Binding ImportSaveDataCommand}"/>
                 <Separator/>
                 <MenuItem Header="Clear workspace" Command="{Binding ClearWorkspaceCommand}"/>
+                <Separator/>
+                <MenuItem Header="Exit" Click="ExitMenuItem_Click"/>
             </MenuItem>
         </Menu>
 
