@@ -58,7 +58,9 @@ namespace MHWSaveTransfer.ViewModels
                 try
                 {
                     _saveData = new SaveData(ofd.FileName);
-                    _saveData.SaveSlots.ForEach(x => MySaveSlots.Add(new SaveSlotViewModel(x)));
+
+                    foreach (var slot in _saveData.SaveSlots)
+                        MySaveSlots.Add(new SaveSlotViewModel(slot));
                 }
                 catch (Exception ex)
                 {
@@ -92,13 +94,13 @@ namespace MHWSaveTransfer.ViewModels
                     try
                     {
                         SaveData saveData = new SaveData(fileName);
-                        saveData.SaveSlots.ForEach(saveSlot =>
+                        foreach (var saveSlot in saveData.SaveSlots)
                         {
                             // Only add if not already added
                             SaveSlotViewModel newVm = new SaveSlotViewModel(saveSlot);
                             if (OtherSaveSlots.FirstOrDefault(x => x.SoftCompare(newVm)) == null)
                                 OtherSaveSlots.Add(newVm);
-                        });
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -182,10 +184,16 @@ namespace MHWSaveTransfer.ViewModels
                     // which would throw and OutOfRange exception so in those cases we simply
                     // set insertIndex -= 1 which gives the same desired result (move item after)
                     int insertIndex = e.UnfilteredInsertIndex;
+
+                    if (e.InsertPosition.HasFlag(RelativeInsertPosition.AfterTargetItem))
+                        insertIndex--;
+
                     if (insertIndex > MySaveSlots.Count - 1)
                         insertIndex = MySaveSlots.Count - 1;
 
-                    MySaveSlots.Move(e.DragInfo.SourceIndex, insertIndex);
+                    var tmp = MySaveSlots[insertIndex];
+                    MySaveSlots[insertIndex] = MySaveSlots[e.DragInfo.SourceIndex];
+                    MySaveSlots[e.DragInfo.SourceIndex] = tmp;
                 }
                 else if (e.TargetCollection == OtherSaveSlots)
                 {
@@ -198,8 +206,12 @@ namespace MHWSaveTransfer.ViewModels
             {
                 if (e.TargetCollection == MySaveSlots && targetItem != null)
                 {
+                    int insertIndex = e.UnfilteredInsertIndex;
+                    if (e.InsertPosition.HasFlag(RelativeInsertPosition.BeforeTargetItem))
+                        insertIndex++;
+
                     // Replace
-                    MySaveSlots.Insert(e.UnfilteredInsertIndex, sourceItem);
+                    MySaveSlots.Insert(insertIndex, sourceItem);
                     MySaveSlots.Remove(targetItem);
                 }
             }

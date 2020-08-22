@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MHWSaveTransfer", "MHWSaveTransfer\MHWSaveTransfer.csproj", "{7674EFFE-76E3-4B32-99B1-CAA0CD78A95E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cirilla.Core", "L:\Repos\MHWSaveTransfer\Cirilla.Core\Cirilla.Core.csproj", "{781B70D7-26E2-470F-AF97-40B7540D2B21}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cirilla.Core", "..\Cirilla\src\Cirilla.Core\Cirilla.Core.csproj", "{781B70D7-26E2-470F-AF97-40B7540D2B21}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
