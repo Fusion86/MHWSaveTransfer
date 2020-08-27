@@ -34,12 +34,17 @@ namespace MHWSaveTransfer.Helpers
 
             string userDataRoot = Path.Combine(steamRoot, "userdata");
 
-            // Each steam account has its own userdata folder, and there could be multiple steam accounts on this computer
-            foreach (var userDataPath in Directory.GetDirectories(userDataRoot))
+            // Not sure why this needs to be inside a try-catch, but it should solve some crashes for some users.
+            try
             {
-                if (Directory.GetDirectories(userDataPath).FirstOrDefault(x => x.Contains(MONSTER_HUNTER_WORLD_APPID)) != null)
-                    return Path.Combine(userDataPath, MONSTER_HUNTER_WORLD_APPID, "remote");
+                // Each steam account has its own userdata folder, and there could be multiple steam accounts on this computer
+                foreach (var userDataPath in Directory.GetDirectories(userDataRoot))
+                {
+                    if (Directory.GetDirectories(userDataPath).FirstOrDefault(x => x.Contains(MONSTER_HUNTER_WORLD_APPID)) != null)
+                        return Path.Combine(userDataPath, MONSTER_HUNTER_WORLD_APPID, "remote");
+                }
             }
+            catch { }
 
             return null;
         }
