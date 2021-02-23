@@ -7,19 +7,13 @@
         mc:Ignorable="d"
         SizeToContent="WidthAndHeight" Width="300"
         ResizeMode="CanResize" WindowStyle="ToolWindow" WindowStartupLocation="CenterOwner">
-    <Grid Margin="5">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="5"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-        </Grid.RowDefinitions>
 
-        <TextBox Grid.Row="0" Text="{Binding Text}"/>
+    <StackPanel Margin="5">
+        <TextBox Text="{Binding Text}"/>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <!--<Button Content="Browse"/>-->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
             <Button Content="Cancel" Margin="0,0,5,0" Width="100" Click="Button_Cancel"/>
             <Button Content="Apply" Width="100" Click="Button_Apply"/>
         </StackPanel>
-    </Grid>
+    </StackPanel>
 </Window>

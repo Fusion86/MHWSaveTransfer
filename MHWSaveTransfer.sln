@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.168
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31005.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MHWSaveTransfer", "MHWSaveTransfer\MHWSaveTransfer.csproj", "{7674EFFE-76E3-4B32-99B1-CAA0CD78A95E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MHWSaveTransfer", "src\MHWSaveTransfer\MHWSaveTransfer.csproj", "{9FDBAB4B-F4D9-4C34-8FF2-127106A853E5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cirilla.Core", "..\Cirilla\src\Cirilla.Core\Cirilla.Core.csproj", "{781B70D7-26E2-470F-AF97-40B7540D2B21}"
 EndProject
@@ -13,10 +13,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7674EFFE-76E3-4B32-99B1-CAA0CD78A95E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7674EFFE-76E3-4B32-99B1-CAA0CD78A95E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7674EFFE-76E3-4B32-99B1-CAA0CD78A95E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7674EFFE-76E3-4B32-99B1-CAA0CD78A95E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FDBAB4B-F4D9-4C34-8FF2-127106A853E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FDBAB4B-F4D9-4C34-8FF2-127106A853E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FDBAB4B-F4D9-4C34-8FF2-127106A853E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FDBAB4B-F4D9-4C34-8FF2-127106A853E5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{781B70D7-26E2-470F-AF97-40B7540D2B21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{781B70D7-26E2-470F-AF97-40B7540D2B21}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{781B70D7-26E2-470F-AF97-40B7540D2B21}.Release|Any CPU.ActiveCfg = Release|Any CPU

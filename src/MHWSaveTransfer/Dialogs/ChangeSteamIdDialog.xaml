@@ -1,0 +1,77 @@
+﻿<Window x:Class="MHWSaveTransfer.Dialogs.ChangeSteamIdDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:root="clr-namespace:MHWSaveTransfer"
+        mc:Ignorable="d"
+        Title="Change SteamID"
+        SizeToContent="WidthAndHeight" MinWidth="400"
+        ResizeMode="NoResize"
+        WindowStyle="ToolWindow"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="10"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Expander Header="Help me find my Steam ID">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Search for your Steam account"/>
+
+                <DockPanel Grid.Row="1"  Margin="0,5,0,0">
+                    <Button DockPanel.Dock="Right" Content="Search" Margin="5,0,0,0" Click="Button_SearchSteamAccount"/>
+                    <TextBox x:Name="TxtSearchQuery" KeyDown="TxtSearchQuery_KeyDown"/>
+                </DockPanel>
+
+                <TextBlock x:Name="TxtLoading" Grid.Row="2" Margin="0,5,0,0" Visibility="Collapsed"/>
+
+                <ListBox x:Name="LstSteamAccounts"
+                         Grid.Row="2"
+                         Margin="0,5,0,0"
+                         MaxHeight="208"
+                         Visibility="Collapsed"
+                         SelectionChanged="LstSteamAccounts_SelectionChanged">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Image Grid.Column="0" Width="64" Height="64" Source="{Binding AvatarUrl}"/>
+
+                                <StackPanel Grid.Column="1" Margin="10,0,10,0">
+                                    <TextBlock Text="{Binding PersonaName}"/>
+                                    <TextBlock Text="{Binding RealName}"/>
+                                    <TextBlock Text="{Binding Location}"/>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Expander>
+
+        <StackPanel Grid.Row="2">
+            <TextBlock Text="New SteamID"/>
+
+            <TextBox Text="{Binding SteamId}" Margin="0,5,0,0"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
+                <Button Content="Cancel" Margin="0,0,5,0" Width="100" Click="Button_Cancel"/>
+                <Button Content="Apply" Width="100" Click="Button_Apply"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -2,13 +2,16 @@
 using GongSolutions.Wpf.DragDrop;
 using MHWSaveTransfer.Dialogs;
 using MHWSaveTransfer.Helpers;
+using MHWSaveTransfer.Models;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace MHWSaveTransfer.ViewModels
@@ -20,7 +23,7 @@ namespace MHWSaveTransfer.ViewModels
         public ObservableCollection<SaveSlotViewModel> MySaveSlots { get; } = new ObservableCollection<SaveSlotViewModel>();
         public ObservableCollection<SaveSlotViewModel> OtherSaveSlots { get; } = new ObservableCollection<SaveSlotViewModel>();
 
-        public string SteamId => _saveData?.SteamId.ToString() ?? "(none)";
+        public string SteamId { get; set; }
         public string VersionString => "Version: " + Assembly.GetExecutingAssembly().GetName().Version;
 
         public RelayCommand OpenSaveDataCommand { get; }
@@ -29,7 +32,9 @@ namespace MHWSaveTransfer.ViewModels
         public RelayCommand ClearWorkspaceCommand { get; }
         public RelayCommand ChangeSteamIdCommand { get; }
 
-        private SaveData _saveData { get; set; }
+        private SaveData? saveData { get; set; }
+        private List<SteamAccount>? steamUsersWithMhw;
+        private readonly SteamWebApi steamWebApi = new SteamWebApi(SuperSecret.STEAM_WEB_API_KEY);
 
         public MainWindowViewModel()
         {
@@ -38,28 +43,68 @@ namespace MHWSaveTransfer.ViewModels
             ImportSaveDataCommand = new RelayCommand(ImportSaveData, CanImportSaveData);
             ClearWorkspaceCommand = new RelayCommand(ClearWorkspace);
             ChangeSteamIdCommand = new RelayCommand(ChangeSteamId, CanChangeSteamId);
+
+            UpdateSteamIdDisplay();
+            _ = Task.Run(() => steamUsersWithMhw = SteamUtility.GetSteamUsersWithMhw());
+        }
+
+        private void UpdateSteamIdDisplay()
+        {
+            if (saveData == null)
+            {
+                SteamId = "(none)";
+            }
+            else
+            {
+                SteamId = saveData.SteamId.ToString();
+                _ = Task.Run(async () =>
+                {
+                    var personaName = await steamWebApi.GetPersonaName(saveData.SteamId.ToString());
+                    SteamId = $"{saveData.SteamId} ({personaName})";
+                });
+            }
         }
 
         #region Commands
 
         private void OpenSaveData()
         {
-            MySaveSlots.Clear();
-            _saveData = null;
-
             OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "SAVEDATA1000|SAVEDATA1000|All files (*.*)|*.*";
 
-            string savePath = Utility.GetMhwSaveDir();
-            if (savePath != null)
-                ofd.InitialDirectory = savePath;
+            SteamAccount? steamAccount = null;
+
+            if (steamUsersWithMhw != null)
+            {
+                if (steamUsersWithMhw.Count > 1)
+                {
+                    // TODO: Ask user to select a steam account.
+                    steamAccount = steamUsersWithMhw[0];
+                }
+                else if (steamUsersWithMhw.Count == 1)
+                {
+                    steamAccount = steamUsersWithMhw[0];
+                }
+
+                if (steamAccount != null)
+                {
+                    string? saveDir = SteamUtility.GetMhwSaveDir(steamUsersWithMhw[0]);
+                    if (saveDir != null)
+                        ofd.InitialDirectory = saveDir;
+                }
+            }
 
             if (ofd.ShowDialog() == true)
             {
+                MySaveSlots.Clear();
+                saveData = null;
+
                 try
                 {
-                    _saveData = new SaveData(ofd.FileName);
+                    saveData = new SaveData(ofd.FileName);
+                    UpdateSteamIdDisplay();
 
-                    foreach (var slot in _saveData.SaveSlots)
+                    foreach (var slot in saveData.SaveSlots)
                         MySaveSlots.Add(new SaveSlotViewModel(slot));
                 }
                 catch (Exception ex)
@@ -69,25 +114,31 @@ namespace MHWSaveTransfer.ViewModels
             }
         }
 
-        private bool CanSaveSaveData() => _saveData != null;
+        private bool CanSaveSaveData() => saveData != null;
         private void SaveSaveData()
         {
+            if (saveData == null) return;
+
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.FileName = "SAVEDATA1000";
+            sfd.Filter = "SAVEDATA1000|SAVEDATA1000|All files (*.*)|*.*";
+
             if (sfd.ShowDialog() == true)
             {
                 for (int i = 0; i < 3; i++)
-                    _saveData.SaveSlots[i] = MySaveSlots[i].SaveSlot;
+                    saveData.SaveSlots[i] = MySaveSlots[i].SaveSlot;
 
-                _saveData.Save(sfd.FileName);
+                saveData.Save(sfd.FileName);
             }
         }
 
         private bool CanImportSaveData() => true;
-        private async void ImportSaveData()
+        private void ImportSaveData()
         {
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Multiselect = true;
+            ofd.Filter = "SAVEDATA1000|SAVEDATA1000|All files (*.*)|*.*";
+
             if (ofd.ShowDialog() == true)
             {
                 foreach (string fileName in ofd.FileNames)
@@ -115,23 +166,25 @@ namespace MHWSaveTransfer.ViewModels
         {
             MySaveSlots.Clear();
             OtherSaveSlots.Clear();
-            _saveData = null;
+            saveData = null;
+            UpdateSteamIdDisplay();
         }
 
-        private bool CanChangeSteamId() => _saveData != null;
+        private bool CanChangeSteamId() => saveData != null;
         private void ChangeSteamId()
         {
-            EnterTextDialog dialog = new EnterTextDialog("Enter SteamID", SteamId);
+            if (saveData == null) return;
+
+            ChangeSteamIdDialog dialog = new ChangeSteamIdDialog(saveData.SteamId.ToString());
             dialog.Owner = Application.Current.MainWindow;
+
             if (dialog.ShowDialog() == true)
             {
                 try
                 {
                     // Try to set SteamId in savedata
-                    _saveData.SteamId = long.Parse(dialog.Text);
-
-                    // Update UI
-                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(SteamId)));
+                    saveData.SteamId = long.Parse(dialog.SteamId);
+                    UpdateSteamIdDisplay();
                 }
                 catch (Exception ex)
                 {
@@ -146,8 +199,8 @@ namespace MHWSaveTransfer.ViewModels
 
         void IDropTarget.DragOver(IDropInfo e)
         {
-            SaveSlotViewModel sourceItem = e.Data as SaveSlotViewModel;
-            SaveSlotViewModel targetItem = e.TargetItem as SaveSlotViewModel;
+            //SaveSlotViewModel sourceItem = (SaveSlotViewModel)e.Data;
+            SaveSlotViewModel targetItem = (SaveSlotViewModel)e.TargetItem;
 
             if (e.DragInfo.SourceCollection == MySaveSlots)
             {
@@ -174,8 +227,8 @@ namespace MHWSaveTransfer.ViewModels
 
         void IDropTarget.Drop(IDropInfo e)
         {
-            SaveSlotViewModel sourceItem = e.Data as SaveSlotViewModel;
-            SaveSlotViewModel targetItem = e.TargetItem as SaveSlotViewModel;
+            SaveSlotViewModel sourceItem = (SaveSlotViewModel)e.Data;
+            SaveSlotViewModel targetItem = (SaveSlotViewModel)e.TargetItem;
 
             if (e.DragInfo.SourceCollection == MySaveSlots)
             {

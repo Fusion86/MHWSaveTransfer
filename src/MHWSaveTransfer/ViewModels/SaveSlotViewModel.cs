@@ -26,7 +26,7 @@ namespace MHWSaveTransfer.ViewModels
             ToggleGenderCommand = new RelayCommand(ToggleGender);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is SaveSlotViewModel other)
             {
@@ -82,6 +82,7 @@ namespace MHWSaveTransfer.ViewModels
         {
             EnterTextDialog dialog = new EnterTextDialog("Enter hunter name", HunterName);
             dialog.Owner = Application.Current.MainWindow;
+
             if (dialog.ShowDialog() == true)
             {
                 try
@@ -99,6 +100,7 @@ namespace MHWSaveTransfer.ViewModels
         {
             EnterTextDialog dialog = new EnterTextDialog("Enter palico name", PalicoName);
             dialog.Owner = Application.Current.MainWindow;
+
             if (dialog.ShowDialog() == true)
             {
                 try

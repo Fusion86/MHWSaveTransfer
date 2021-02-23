@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using MHWSaveTransfer.Helpers;
 using System.Windows;
 using System.Windows.Input;
 
@@ -16,8 +16,7 @@ namespace MHWSaveTransfer
 
         private void StatusBarItem_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.RightButton == MouseButtonState.Pressed)
-                Process.Start(@"https://www.nexusmods.com/monsterhunterworld/mods/486");
+            Utility.OpenBrowser(@"https://www.nexusmods.com/monsterhunterworld/mods/486");
         }
 
         private void ExitMenuItem_Click(object sender, RoutedEventArgs e)
