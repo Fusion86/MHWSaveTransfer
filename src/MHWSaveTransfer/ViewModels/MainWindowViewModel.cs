@@ -32,9 +32,12 @@ namespace MHWSaveTransfer.ViewModels
         public RelayCommand ClearWorkspaceCommand { get; }
         public RelayCommand ChangeSteamIdCommand { get; }
 
+        private string? saveDataDirectory;
         private SaveData? saveData { get; set; }
         private List<SteamAccount>? steamUsersWithMhw;
+
         private readonly SteamWebApi steamWebApi = new SteamWebApi(SuperSecret.STEAM_WEB_API_KEY);
+        private const string FILE_DIALOG_SAVEDATA_FILTER = "SAVEDATA1000|SAVEDATA1000|All files (*.*)|*.*";
 
         public MainWindowViewModel()
         {
@@ -65,13 +68,8 @@ namespace MHWSaveTransfer.ViewModels
             }
         }
 
-        #region Commands
-
-        private void OpenSaveData()
+        private void SetInitialDirectoryToSaveLocation(FileDialog fd)
         {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "SAVEDATA1000|SAVEDATA1000|All files (*.*)|*.*";
-
             SteamAccount? steamAccount = null;
 
             if (steamUsersWithMhw != null)
@@ -90,9 +88,19 @@ namespace MHWSaveTransfer.ViewModels
                 {
                     string? saveDir = SteamUtility.GetMhwSaveDir(steamUsersWithMhw[0]);
                     if (saveDir != null)
-                        ofd.InitialDirectory = saveDir;
+                        fd.InitialDirectory = saveDir;
                 }
             }
+        }
+
+        #region Commands
+
+        private void OpenSaveData()
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = FILE_DIALOG_SAVEDATA_FILTER;
+
+            SetInitialDirectoryToSaveLocation(ofd);
 
             if (ofd.ShowDialog() == true)
             {
@@ -102,6 +110,10 @@ namespace MHWSaveTransfer.ViewModels
                 try
                 {
                     saveData = new SaveData(ofd.FileName);
+
+                    // Remember where the save file is located, so that we can open the "Save" dialog in the same directory.
+                    saveDataDirectory = Path.GetDirectoryName(ofd.FileName);
+
                     UpdateSteamIdDisplay();
 
                     foreach (var slot in saveData.SaveSlots)
@@ -121,7 +133,10 @@ namespace MHWSaveTransfer.ViewModels
 
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.FileName = "SAVEDATA1000";
-            sfd.Filter = "SAVEDATA1000|SAVEDATA1000|All files (*.*)|*.*";
+            sfd.Filter = FILE_DIALOG_SAVEDATA_FILTER;
+
+            if (saveDataDirectory != null)
+                sfd.InitialDirectory = saveDataDirectory;
 
             if (sfd.ShowDialog() == true)
             {
@@ -137,7 +152,7 @@ namespace MHWSaveTransfer.ViewModels
         {
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Multiselect = true;
-            ofd.Filter = "SAVEDATA1000|SAVEDATA1000|All files (*.*)|*.*";
+            ofd.Filter = FILE_DIALOG_SAVEDATA_FILTER;
 
             if (ofd.ShowDialog() == true)
             {
