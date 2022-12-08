@@ -14,7 +14,7 @@
         <PackageReference Include="AngleSharp" Version="0.14.0" />
         <PackageReference Include="Gameloop.Vdf" Version="0.6.1" />
         <PackageReference Include="Microsoft.CSharp" Version="4.*" />
-        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
         <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
         <PackageReference Include="System.Net.Http" Version="4.*" />
