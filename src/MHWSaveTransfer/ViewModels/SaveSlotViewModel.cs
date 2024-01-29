@@ -1,8 +1,11 @@
 ﻿using Cirilla.Core.Enums;
+using Cirilla.Core.Extensions;
 using Cirilla.Core.Models;
 using MHWSaveTransfer.Dialogs;
+using Microsoft.Win32;
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Windows;
 
 namespace MHWSaveTransfer.ViewModels
@@ -14,6 +17,7 @@ namespace MHWSaveTransfer.ViewModels
         public RelayCommand ChangeHunterNameCommand { get; }
         public RelayCommand ChangePalicoNameCommand { get; }
         public RelayCommand ToggleGenderCommand { get; }
+        public RelayCommand ExportMhwslotCommand { get; }
 
         public SaveSlot SaveSlot;
 
@@ -24,6 +28,7 @@ namespace MHWSaveTransfer.ViewModels
             ChangeHunterNameCommand = new RelayCommand(ChangeHunterName);
             ChangePalicoNameCommand = new RelayCommand(ChangePalicoName);
             ToggleGenderCommand = new RelayCommand(ToggleGender);
+            ExportMhwslotCommand = new RelayCommand(ExportMhwslot);
         }
 
         public override bool Equals(object? obj)
@@ -118,6 +123,17 @@ namespace MHWSaveTransfer.ViewModels
         {
             SaveSlot.CharacterAppearance.Gender = SaveSlot.CharacterAppearance.Gender == Cirilla.Core.Enums.Gender.Female ? Cirilla.Core.Enums.Gender.Male : Cirilla.Core.Enums.Gender.Female;
             PropertyChanged(this, new PropertyChangedEventArgs(nameof(Gender)));
+        }
+
+        private void ExportMhwslot()
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = MainWindowViewModel.FILE_DIALOG_MHWSLOT_FILTER;
+
+            if (sfd.ShowDialog() == true)
+            {
+                File.WriteAllBytes(sfd.FileName, SaveSlot.Native.ToBytes());
+            }
         }
 
         #endregion

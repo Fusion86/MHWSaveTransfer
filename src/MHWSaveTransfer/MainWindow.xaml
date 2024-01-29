@@ -70,8 +70,8 @@
                                     <MenuItem Header="Change hunter name" Command="{Binding ChangeHunterNameCommand}"/>
                                     <MenuItem Header="Change palico name" Command="{Binding ChangePalicoNameCommand}"/>
                                     <MenuItem Header="Toggle gender" Command="{Binding ToggleGenderCommand}"/>
-                                    <!--<Separator/>
-                                    <MenuItem Header="Export as .mhwslot"/>-->
+                                    <Separator/>
+                                    <MenuItem Header="Export as .mhwslot" Command="{Binding ExportMhwslotCommand}"/>
                                 </ContextMenu>
                             </uc:SaveSlotItem.ContextMenu>
                         </uc:SaveSlotItem>
@@ -112,7 +112,7 @@
                 </ListView.ItemContainerStyle>
             </ListView>
 
-            <Button Grid.Column="2" Grid.Row="4" Content="Import Profiles from another SaveData file" Command="{Binding ImportSaveDataCommand}"/>
+            <Button Grid.Column="2" Grid.Row="4" Content="Import Profiles from another SaveData or .mhwslot file" Command="{Binding ImportSaveDataCommand}"/>
         </Grid>
     </DockPanel>
 </Window>

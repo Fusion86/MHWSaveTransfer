@@ -1,4 +1,6 @@
-﻿using Cirilla.Core.Models;
+﻿using Cirilla.Core.Extensions;
+using Cirilla.Core.Models;
+using Cirilla.Core.Structs.Native;
 using GongSolutions.Wpf.DragDrop;
 using MHWSaveTransfer.Dialogs;
 using MHWSaveTransfer.Helpers;
@@ -37,13 +39,16 @@ namespace MHWSaveTransfer.ViewModels
         private List<SteamAccount>? steamUsersWithMhw;
 
         private readonly SteamWebApi steamWebApi = new SteamWebApi(SuperSecret.STEAM_WEB_API_KEY);
+        private readonly BackupHelper backupHelper = new BackupHelper();
+
         private const string FILE_DIALOG_SAVEDATA_FILTER = "SAVEDATA1000|SAVEDATA1000|All files (*.*)|*.*";
+        public const string FILE_DIALOG_MHWSLOT_FILTER = "*.mhwslot|*.mhwslot|All files (*.*)|*.*";
 
         public MainWindowViewModel()
         {
             OpenSaveDataCommand = new RelayCommand(OpenSaveData);
             SaveSaveDataCommand = new RelayCommand(SaveSaveData, CanSaveSaveData);
-            ImportSaveDataCommand = new RelayCommand(ImportSaveData, CanImportSaveData);
+            ImportSaveDataCommand = new RelayCommand(ImportSaveDataOrSlots, CanImportSaveData);
             ClearWorkspaceCommand = new RelayCommand(ClearWorkspace);
             ChangeSteamIdCommand = new RelayCommand(ChangeSteamId, CanChangeSteamId);
 
@@ -114,6 +119,9 @@ namespace MHWSaveTransfer.ViewModels
                     // Remember where the save file is located, so that we can open the "Save" dialog in the same directory.
                     saveDataDirectory = Path.GetDirectoryName(ofd.FileName);
 
+                    // Create a backup for safety.
+                    backupHelper.CreateBackup(saveData);
+
                     UpdateSteamIdDisplay();
 
                     foreach (var slot in saveData.SaveSlots)
@@ -148,11 +156,11 @@ namespace MHWSaveTransfer.ViewModels
         }
 
         private bool CanImportSaveData() => true;
-        private void ImportSaveData()
+        private void ImportSaveDataOrSlots()
         {
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Multiselect = true;
-            ofd.Filter = FILE_DIALOG_SAVEDATA_FILTER;
+            ofd.Filter = "All files (*.*)|*.*|SAVEDATA1000|SAVEDATA1000|.mhwslot|*.mhwslot";
 
             if (ofd.ShowDialog() == true)
             {
@@ -160,13 +168,24 @@ namespace MHWSaveTransfer.ViewModels
                 {
                     try
                     {
-                        SaveData saveData = new SaveData(fileName);
-                        foreach (var saveSlot in saveData.SaveSlots)
+                        if (fileName.EndsWith(".mhwslot") || new FileInfo(fileName).Length == 2136768)
                         {
+                            var nativeSlot = File.ReadAllBytes(fileName).ToStruct<SaveData_SaveSlot>();
                             // Only add if not already added
-                            SaveSlotViewModel newVm = new SaveSlotViewModel(saveSlot);
+                            SaveSlotViewModel newVm = new SaveSlotViewModel(new SaveSlot(null, nativeSlot));
                             if (OtherSaveSlots.FirstOrDefault(x => x.SoftCompare(newVm)) == null)
                                 OtherSaveSlots.Add(newVm);
+                        }
+                        else
+                        {
+                            SaveData saveData = new SaveData(fileName);
+                            foreach (var saveSlot in saveData.SaveSlots)
+                            {
+                                // Only add if not already added
+                                SaveSlotViewModel newVm = new SaveSlotViewModel(saveSlot);
+                                if (OtherSaveSlots.FirstOrDefault(x => x.SoftCompare(newVm)) == null)
+                                    OtherSaveSlots.Add(newVm);
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -216,6 +235,8 @@ namespace MHWSaveTransfer.ViewModels
         {
             //SaveSlotViewModel sourceItem = (SaveSlotViewModel)e.Data;
             SaveSlotViewModel targetItem = (SaveSlotViewModel)e.TargetItem;
+
+            if (e.DragInfo?.SourceCollection == null) return;
 
             if (e.DragInfo.SourceCollection == MySaveSlots)
             {
